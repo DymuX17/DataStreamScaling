@@ -30,6 +30,17 @@ services:
     volumes:
       - ./kafka:/var/lib/kafka/data
 
+  producer:
+      build: .producer
+      container_name: producer
+      depends_on:
+        - kafka
+      environment:
+        - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+        - SERVER_PORT=8082
+      ports:
+        - "8082:8082"
+
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
     container_name: kafka-ui
