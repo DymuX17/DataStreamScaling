@@ -31,7 +31,7 @@ services:
       - ./kafka:/var/lib/kafka/data
 
   producer:
-      build: .producer
+      build: .
       container_name: producer
       depends_on:
         - kafka
