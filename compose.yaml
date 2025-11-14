@@ -1,11 +1,13 @@
 version: "3.8"
 
 services:
+
   kafka:
     image: apache/kafka:3.7.0
     container_name: kafka
     ports:
       - "9092:9092"
+      - "29092:29092"
     environment:
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
@@ -17,29 +19,40 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
 
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_LOG_RETENTION_HOURS: 168
-      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-
-      KAFKA_LOG_DIRS: /var/lib/kafka/data
 
       CLUSTER_ID: "onMN-awqQVSimQZ1z5pKnw"
 
     volumes:
       - ./kafka:/var/lib/kafka/data
 
+    healthcheck:
+      test: ["CMD", "bash", "-c", "echo > /dev/tcp/localhost/9092"]
+      interval: 5s
+      retries: 20
+      timeout: 5s
+
+    restart: unless-stopped
+
+
   producer:
-      build: .
-      container_name: producer
-      depends_on:
-        - kafka
-      environment:
-        - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-        - SERVER_PORT=8082
-      ports:
-        - "8082:8082"
+    build: .
+    container_name: producer
+    depends_on:
+      kafka:
+        condition: service_healthy
+    environment:
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - SERVER_PORT=8082
+    ports:
+      - "8082:8082"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/actuator/health"]
+      interval: 5s
+      retries: 20
+      timeout: 5s
+    restart: unless-stopped
+
 
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
@@ -50,12 +63,14 @@ services:
       - KAFKA_CLUSTERS_0_NAME=local
       - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
     depends_on:
-      - kafka
+      kafka:
+        condition: service_healthy
+    restart: unless-stopped
+
 
   postgres:
     image: postgres:15
     container_name: postgres
-    restart: always
     ports:
       - "5432:5432"
     environment:
@@ -64,6 +79,13 @@ services:
       POSTGRES_DB: stream_db
     volumes:
       - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 5s
+      retries: 20
+      timeout: 5s
+    restart: unless-stopped
+
 
   prometheus:
     image: prom/prometheus:v2.53.0
@@ -72,11 +94,11 @@ services:
       - "9090:9090"
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-    command:
-      - "--config.file=/etc/prometheus/prometheus.yml"
     depends_on:
       - kafka
       - postgres
+    restart: unless-stopped
+
 
   grafana:
     image: grafana/grafana:11.1.0
@@ -89,7 +111,10 @@ services:
     volumes:
       - grafana-data:/var/lib/grafana
     depends_on:
-      - prometheus
+      prometheus:
+        condition: service_started
+    restart: unless-stopped
+
 
 volumes:
   postgres-data:

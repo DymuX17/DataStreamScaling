@@ -3,8 +3,10 @@ WORKDIR /build
 COPY . .
 RUN mvn -pl producer -am clean package -DskipTests
 
-FROM eclipse-temurin:21-jdk
+FROM eclipse-temurin:21-jre
 WORKDIR /app
 COPY --from=build /build/producer/target/*.jar app.jar
+
 EXPOSE 8082
-ENTRYPOINT ["java", "-jar", "app.jar"]
+
+ENTRYPOINT ["java", "-XX:+ExitOnOutOfMemoryError", "-jar", "app.jar"]

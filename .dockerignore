@@ -1,0 +1,13 @@
+.git
+.gitignore
+target
+producer/target
+consumer/target
+processor/target
+*.md
+*.log
+compose.yml
+docker-compose.yml
+prometheus/
+grafana/
+kafka/
