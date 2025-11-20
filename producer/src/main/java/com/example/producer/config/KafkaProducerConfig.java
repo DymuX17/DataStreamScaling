@@ -1,7 +1,7 @@
 package com.example.producer.config;
 
 
-import com.example.producer.model.Order;
+import com.example.common.model.Order;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;

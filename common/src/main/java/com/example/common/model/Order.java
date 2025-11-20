@@ -1,4 +1,4 @@
-package com.example.consumer.model;
+package com.example.common.model;
 
 
 import lombok.AllArgsConstructor;
@@ -6,12 +6,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class Order {
-
     private String orderId;
     private String userId;
     private double amount;
-
 }

@@ -1,7 +1,8 @@
 package com.example.consumer.service;
 
 
-import com.example.consumer.model.Order;
+import com.example.common.kafka.Topics;
+import com.example.common.model.Order;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class OrderConsumer {
 
-    @KafkaListener(topics = "orders", groupId = "order-consumer")
+    @KafkaListener(topics = Topics.ORDERS, groupId = "order-consumer")
     public void receiveOrder(Order order) {
         log.info("Received order: {}", order);
     }
