@@ -11,7 +11,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class OrderConsumer {
 
-    @KafkaListener(topics = Topics.ORDERS, groupId = "order-consumer")
+    @KafkaListener(
+            topics = Topics.ORDERS,
+            groupId = "order-consumer",
+            containerFactory = "orderKafkaListenerContainerFactory"
+    )
     public void receiveOrder(Order order) {
         log.info("Received order: {}", order);
     }
