@@ -152,7 +152,7 @@ docker compose up -d --build
 | Module | Status |
 |--------|--------|
 | Producer | ✅ Completed |
-| Consumer | 🟡 Active development |
+| Consumer | ✅ Completed |
 | Processor | 🔜 Planned |
 | Postgres Integration | 🔜 Planned |
 | Kubernetes Deployment | 🔜 Planned |
