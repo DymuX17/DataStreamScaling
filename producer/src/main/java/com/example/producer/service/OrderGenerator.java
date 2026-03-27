@@ -1,6 +1,7 @@
 package com.example.producer.service;
 
-import com.example.producer.model.Order;
+import com.example.common.kafka.Topics;
+import com.example.common.model.Order;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +13,7 @@ import java.util.UUID;
 
 @Component
 public class OrderGenerator {
-    private static final String TOPIC = "orders";
+    private static final String TOPIC = Topics.ORDERS;
     private static final Logger logger = LoggerFactory.getLogger(OrderGenerator.class);
 
     private final KafkaTemplate<String, Order> kafkaTemplate;
