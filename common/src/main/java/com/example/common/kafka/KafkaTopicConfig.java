@@ -9,6 +9,6 @@ public class KafkaTopicConfig {
 
     @Bean
     public NewTopic ordersTopic() {
-        return new NewTopic("orders", 1, (short) 1);
+        return new NewTopic(Topics.ORDERS, 3, (short) 3);
     }
 }

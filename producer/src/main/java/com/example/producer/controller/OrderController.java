@@ -2,6 +2,7 @@ package com.example.producer.controller;
 
 import com.example.common.kafka.Topics;
 import com.example.common.model.Order;
+import com.example.producer.service.OrderGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,8 +19,9 @@ public class OrderController {
 
     @PostMapping
     public String postOrder(@RequestBody Order order) {
-        kafkaTemplate.send(TOPIC, order.getOrderId(), order);
-        return "Order sent to Kafka topic!";
+        String tier = OrderGenerator.amountTier(order.getAmount());
+        kafkaTemplate.send(TOPIC, tier, order);
+        return "Order sent to Kafka topic with tier key: " + tier;
     }
 
 }

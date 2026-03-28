@@ -4,6 +4,7 @@ package com.example.consumer.service;
 import com.example.common.kafka.Topics;
 import com.example.common.model.Order;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +17,8 @@ public class OrderConsumer {
             groupId = "order-consumer",
             containerFactory = "orderKafkaListenerContainerFactory"
     )
-    public void receiveOrder(Order order) {
-        log.info("Received order: {}", order);
+    public void receiveOrder(ConsumerRecord<String, Order> record) {
+        log.info("Received order [partition={}, tier={}, offset={}]: {}",
+                record.partition(), record.key(), record.offset(), record.value());
     }
 }

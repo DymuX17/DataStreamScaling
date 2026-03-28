@@ -28,8 +28,9 @@ public class OrderGenerator {
         Thread t = new Thread(() -> {
             while (!Thread.currentThread().isInterrupted()) {
                 Order order = generateRandomOrder();
-                logger.info("Sending order to topic: {}: {}", TOPIC, order);
-                kafkaTemplate.send(TOPIC, order.getOrderId(), order);
+                String tier = amountTier(order.getAmount());
+                logger.info("Sending order [tier={}] to topic {}: {}", tier, TOPIC, order);
+                kafkaTemplate.send(TOPIC, tier, order);
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
@@ -39,7 +40,20 @@ public class OrderGenerator {
         });
         t.setDaemon(true);
         t.start();
+    }
 
+    /**
+     * Routes orders to one of three partitions based on order amount:
+     *   LOW    – amount < 340   (roughly $10–$339)
+     *   MEDIUM – amount < 670   (roughly $340–$669)
+     *   HIGH   – amount >= 670  (roughly $670–$1000)
+     * Kafka's default hash partitioner maps each constant key to a fixed partition,
+     * enabling parallel consumption across 3 consumer threads.
+     */
+    public static String amountTier(double amount) {
+        if (amount < 340) return "LOW";
+        if (amount < 670) return "MEDIUM";
+        return "HIGH";
     }
 
     private Order generateRandomOrder() {
