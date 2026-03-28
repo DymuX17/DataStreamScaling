@@ -1,13 +1,22 @@
 .git
 .gitignore
-target
-producer/target
-consumer/target
-processor/target
+
+# Kafka broker data (bind-mounted volumes — can be hundreds of MB)
+kafka1/
+kafka2/
+kafka3/
+
+# Maven build output (all modules)
+**/target/
+
+# Temp files
+tmpclaude-*
+
+# Docs and config not needed in the image
 *.md
 *.log
+compose.yaml
 compose.yml
 docker-compose.yml
 prometheus/
 grafana/
-kafka/
